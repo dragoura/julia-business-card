@@ -106,6 +106,7 @@ const LANG_COLORS = {
     HTML: '#e34c26',
     Rust: '#dea584',
     Makefile: '#427819',
+    HCL: '#844FBA',
 };
 
 function langColor(lang) {
