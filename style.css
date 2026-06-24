@@ -230,16 +230,6 @@ body {
 
 @keyframes blink { 50% { opacity: 0; } }
 
-.hero-tagline {
-    font-size: clamp(0.95rem, 2vw, 1.1rem);
-    color: var(--text-muted);
-    max-width: 500px;
-    margin-bottom: 36px;
-    font-style: italic;
-    opacity: 0;
-    animation: fadeUp 0.6s 0.8s forwards;
-}
-
 .hero-actions {
     display: flex;
     gap: 16px;
@@ -247,29 +237,6 @@ body {
     justify-content: center;
     opacity: 0;
     animation: fadeUp 0.6s 1s forwards;
-}
-
-.scroll-hint {
-    position: absolute;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    animation: fadeIn 1s 1.6s forwards;
-}
-
-.scroll-hint span {
-    display: block;
-    width: 2px; height: 40px;
-    background: linear-gradient(to bottom, var(--green), transparent);
-    margin: 0 auto;
-    border-radius: 2px;
-    animation: scrollPulse 1.6s ease-in-out infinite;
-}
-
-@keyframes scrollPulse {
-    0%, 100% { opacity: 0.3; transform: scaleY(1); }
-    50% { opacity: 1; transform: scaleY(1.2); }
 }
 
 /* ── Buttons ──────────────────────────────────── */
@@ -745,10 +712,6 @@ body {
 
 @keyframes fadeUp {
     to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-    to { opacity: 1; }
 }
 
 /* ── Responsive ───────────────────────────────── */
