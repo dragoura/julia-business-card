@@ -760,7 +760,7 @@ body {
         background: rgba(26, 26, 46, 0.97);
         padding: 24px;
         gap: 20px;
-        transform: translateY(-110%);
+        transform: translateY(calc(-100% - var(--nav-h)));
         transition: transform 0.35s ease;
         border-bottom: 1px solid var(--glass-border);
     }
