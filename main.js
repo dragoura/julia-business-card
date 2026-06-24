@@ -1,10 +1,11 @@
 // ── Typewriter ─────────────────────────────────
 const roles = [
-    'DevOps Engineer',
-    'CI/CD Automator',
-    'Infrastructure Nerd',
-    'Pipeline Optimizer',
-    'Docker Enthusiast',
+    'CI/CD pipelines',
+    'On-premise deployment',
+    'Monitoring',
+    'Security compliance',
+    'Infrastructure documentation',
+    'Mentoring',
 ];
 
 function initTypewriter() {
