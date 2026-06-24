@@ -1,10 +1,11 @@
 // ── Typewriter ─────────────────────────────────
 const roles = [
-    'DevOps Engineer',
-    'CI/CD Automator',
-    'Infrastructure Nerd',
-    'Pipeline Optimizer',
-    'Docker Enthusiast',
+    'CI/CD pipelines',
+    'On-premise deployment',
+    'Monitoring',
+    'Security compliance',
+    'Infrastructure documentation',
+    'Mentoring',
 ];
 
 function initTypewriter() {
@@ -105,6 +106,7 @@ const LANG_COLORS = {
     HTML: '#e34c26',
     Rust: '#dea584',
     Makefile: '#427819',
+    HCL: '#844FBA',
 };
 
 function langColor(lang) {
@@ -216,6 +218,128 @@ function initNav() {
     sections.forEach(s => sectionObserver.observe(s));
 }
 
+// ── Network graph ──────────────────────────────
+function initNetworkGraph() {
+    const canvas = document.getElementById('networkCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const PARTICLE_COUNT = 130;
+    const MAX_DIST = 130;
+    const MOUSE_RADIUS = 120;
+    const MOUSE_FORCE = 0.012;
+
+    let mouse = { x: null, y: null };
+    let particles = [];
+    let animId;
+
+    function resize() {
+        const hero = canvas.parentElement;
+        canvas.width = hero.offsetWidth;
+        canvas.height = hero.offsetHeight;
+    }
+
+    class Particle {
+        constructor() { this.reset(true); }
+
+        reset(initial) {
+            this.x = Math.random() * canvas.width;
+            this.y = initial ? Math.random() * canvas.height : -10;
+            this.vx = (Math.random() - 0.5) * 0.4;
+            this.vy = (Math.random() - 0.5) * 0.4;
+            this.r = Math.random() * 1.8 + 0.8;
+            this.isHub = Math.random() < 0.12;
+            if (this.isHub) this.r = Math.random() * 2.5 + 2;
+            this.green = Math.random() < 0.5;
+        }
+
+        update() {
+            if (mouse.x !== null) {
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < MOUSE_RADIUS) {
+                    this.vx += dx / dist * MOUSE_FORCE;
+                    this.vy += dy / dist * MOUSE_FORCE;
+                }
+            }
+            const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+            if (speed > 0.9) { this.vx = this.vx / speed * 0.9; this.vy = this.vy / speed * 0.9; }
+            this.x += this.vx; this.y += this.vy;
+            if (this.x < -20) this.x = canvas.width + 20;
+            if (this.x > canvas.width + 20) this.x = -20;
+            if (this.y < -20) this.y = canvas.height + 20;
+            if (this.y > canvas.height + 20) this.y = -20;
+        }
+
+        draw() {
+            const color = this.green ? '46,204,113' : '52,152,219';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${color},${this.isHub ? 0.9 : 0.65})`;
+            ctx.fill();
+            if (this.isHub) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r + 3, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(${color},0.2)`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        }
+    }
+
+    function init() {
+        particles = Array.from({ length: PARTICLE_COUNT }, () => new Particle());
+    }
+
+    function frame() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const a = particles[i], b = particles[j];
+                const dx = a.x - b.x, dy = a.y - b.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < MAX_DIST) {
+                    const opacity = (1 - dist / MAX_DIST) * 0.45;
+                    const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+                    grad.addColorStop(0, `rgba(46,204,113,${opacity})`);
+                    grad.addColorStop(1, `rgba(52,152,219,${opacity})`);
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                }
+            }
+        }
+        particles.forEach(p => { p.update(); p.draw(); });
+        animId = requestAnimationFrame(frame);
+    }
+
+    window.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+    }, { passive: true });
+
+    window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+
+    const heroObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) { if (!animId) frame(); }
+            else { cancelAnimationFrame(animId); animId = null; }
+        });
+    }, { threshold: 0.1 });
+
+    heroObserver.observe(canvas.parentElement);
+    window.addEventListener('resize', () => { resize(); init(); }, { passive: true });
+
+    resize();
+    init();
+    frame();
+}
+
 // ── Init ───────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     initNav();
@@ -223,4 +347,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollAnimations();
     initCounters();
     initProjects();
+    initNetworkGraph();
 });
