@@ -1,0 +1,33 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE: ${{ github.run_number }}_${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ vars.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: rsync new files to server
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ vars.SSH_HOST }} "mkdir -p /var/www/releases/${{ env.RELEASE }}"
+          rsync -avz -e "ssh -p ${{ secrets.SSH_PORT }}" index.html main.js style.css ${{ secrets.SSH_USER }}@${{ vars.SSH_HOST }}:/var/www/releases/${{ env.RELEASE }}/
+      
+      - name: Swap symlink to new deployment
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ vars.SSH_HOST }} "
+            ln -sfn /var/www/releases/${{ env.RELEASE }} /var/www/current &&
+            ls -1t /var/www/releases | tail -n +4 | xargs -I {} rm -rf /var/www/releases/{}
+          "
