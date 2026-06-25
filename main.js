@@ -224,7 +224,8 @@ function initNetworkGraph() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    const PARTICLE_COUNT = 130;
+    const isMobile = window.matchMedia('(pointer: coarse)').matches;
+    const PARTICLE_COUNT = isMobile ? 40 : 130;
     const MAX_DIST = 130;
     const MOUSE_RADIUS = 120;
     const MOUSE_FORCE = 0.012;
@@ -317,13 +318,15 @@ function initNetworkGraph() {
         animId = requestAnimationFrame(frame);
     }
 
-    window.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        mouse.x = e.clientX - rect.left;
-        mouse.y = e.clientY - rect.top;
-    }, { passive: true });
+    if (!isMobile) {
+        window.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+        }, { passive: true });
 
-    window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+        window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+    }
 
     const heroObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
