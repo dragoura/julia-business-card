@@ -336,7 +336,15 @@ function initNetworkGraph() {
     }, { threshold: 0.1 });
 
     heroObserver.observe(canvas.parentElement);
-    window.addEventListener('resize', () => { resize(); init(); }, { passive: true });
+    let lastWidth = canvas.width;
+    window.addEventListener('resize', () => {
+        const widthChanged = canvas.parentElement.offsetWidth !== lastWidth;
+        resize();
+        if (widthChanged) {
+            lastWidth = canvas.width;
+            init();
+        }
+    }, { passive: true });
 
     resize();
     init();
